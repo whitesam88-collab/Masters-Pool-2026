@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=EB+Garamond:wght@400;500;600&family=Oswald:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --gd:#1a3c2e; --gm:#2d5a3d; --gl:#4a7c5e; --gp:#e8f2ec;
@@ -1074,6 +1075,11 @@ const TMETA = [
   {label:'🃏 Wild Card 2',          sub:'Any golfer in the field — must differ from all picks.', key:'all'},
 ];
 
+// ── SUPABASE CONFIG ──
+const SUPABASE_URL = 'https://ggclubyvmdfgoeeoiqhi.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdnY2x1Ynl2bWRmZ29lZW9pcWhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MTUxNDYsImV4cCI6MjA5MTA5MTE0Nn0.P96N4SfDT-TfcRTj5GXICt_DQalom68lwkGjGOqtiX8';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // ── STATE ──
 let S = {
   entries:[], players:{favorites:[],contenders:[],sleepers:[],longshots:[]},
@@ -1087,21 +1093,98 @@ let S = {
 };
 let lbR=0, ePicks=[null,null,null,null,null,null];
 
-// ── STORAGE ──
-function load(){
+// ── SUPABASE STORAGE ──
+async function loadFromSupabase(){
   try{
+    // Load entries from Supabase
+    const {data:entries, error:entriesErr} = await supabase.from('entries').select('*').order('created_at',{ascending:true});
+    if(!entriesErr && entries){
+      S.entries = entries.map(e=>({id:e.id, name:e.name, picks:e.picks||[], tbGuess:e.tb_guess}));
+    }
+    // Load settings
+    const {data:settings, error:settingsErr} = await supabase.from('settings').select('*').eq('id',1).single();
+    if(!settingsErr && settings){
+      S.settings.locked = settings.locked || false;
+      S.settings.tbAnswer = settings.tb_answer;
+      S.settings.entryFee = settings.entry_fee || 20;
+    }
+    // Load local-only data (players, scores) from localStorage as backup
     const d=localStorage.getItem(SK);
     if(d){
       const saved=JSON.parse(d);
-      S.entries  = saved.entries  || S.entries;
-      S.players  = saved.players  || S.players;
-      S.scores   = saved.scores   || S.scores;
-      S.settings = Object.assign({},S.settings, saved.settings||{});
+      S.players = saved.players || S.players;
+      S.scores = saved.scores || S.scores;
+      if(saved.settings){
+        S.settings.activeRound = saved.settings.activeRound || 1;
+        S.settings.password = saved.settings.password || 'masters2026';
+      }
     }
-  }catch(e){}
+  }catch(e){console.error('Load error:',e);}
 }
-function save(){
-  try{localStorage.setItem(SK,JSON.stringify({entries:S.entries,players:S.players,scores:S.scores,settings:S.settings}));}catch(e){}
+
+async function saveEntry(entry){
+  try{
+    const {data,error} = await supabase.from('entries').insert({
+      name: entry.name,
+      picks: entry.picks,
+      tb_guess: entry.tbGuess
+    }).select().single();
+    if(error) throw error;
+    entry.id = data.id;
+    return data;
+  }catch(e){console.error('Save entry error:',e);throw e;}
+}
+
+async function updateEntry(entry){
+  try{
+    const {error} = await supabase.from('entries').update({
+      picks: entry.picks,
+      tb_guess: entry.tbGuess,
+      updated_at: new Date().toISOString()
+    }).eq('id', entry.id);
+    if(error) throw error;
+  }catch(e){console.error('Update entry error:',e);}
+}
+
+async function deleteEntry(id){
+  try{
+    const {error} = await supabase.from('entries').delete().eq('id', id);
+    if(error) throw error;
+  }catch(e){console.error('Delete entry error:',e);}
+}
+
+async function saveSettings(){
+  try{
+    await supabase.from('settings').update({
+      locked: S.settings.locked,
+      tb_answer: S.settings.tbAnswer,
+      entry_fee: S.settings.entryFee,
+      updated_at: new Date().toISOString()
+    }).eq('id', 1);
+  }catch(e){console.error('Save settings error:',e);}
+}
+
+// Keep localStorage for local-only data (scores, players, admin settings)
+function saveLocal(){
+  try{localStorage.setItem(SK,JSON.stringify({players:S.players,scores:S.scores,settings:{activeRound:S.settings.activeRound,password:S.settings.password,splits:S.settings.splits}}));}catch(e){}
+}
+function save(){saveLocal();} // Alias for compatibility
+
+// ── REALTIME SUBSCRIPTION ──
+function subscribeToChanges(){
+  supabase.channel('entries-changes')
+    .on('postgres_changes',{event:'*',schema:'public',table:'entries'},async(payload)=>{
+      console.log('Realtime update:',payload);
+      await loadFromSupabase();
+      renderAll();
+      showToast('📡 Pool updated!');
+    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'settings'},async(payload)=>{
+      await loadFromSupabase();
+      renderAll();
+      updateLockNavIndicator();
+    })
+    .subscribe();
 }
 
 // ── SEED DATA (2026 Masters tiers — FanDuel odds via CBS Sports/Golf Channel) ──
@@ -1162,10 +1245,12 @@ function tbLabel(entry){
   return'';
 }
 function saveTbMode(){S.settings.tbMode=document.getElementById('tbMode').value;save();renderLB();updateTbField();}
-function saveTbAnswer(){
+async function saveTbAnswer(){
   const val=document.getElementById('tbAnswer')?.value;
   S.settings.tbAnswer=val!==''?Number(val):null;
-  save();renderLB();showAlert('scoreAlert','✓ Tiebreaker answer saved!','ok');
+  save();
+  await saveSettings(); // Save to Supabase
+  renderLB();showAlert('scoreAlert','✓ Tiebreaker answer saved!','ok');
 }
 function updateTbField(){
   const card=document.getElementById('tbCard');
@@ -1707,8 +1792,10 @@ function handleUrlParams(){
 }
 
 // ── LOCK ENTRIES ──
-function saveLock(){
-  S.settings.locked=document.getElementById('lockToggle').checked;save();
+async function saveLock(){
+  S.settings.locked=document.getElementById('lockToggle').checked;
+  save();
+  await saveSettings(); // Save to Supabase
   updateLockBanner();updateLockNavIndicator();
   showAlert('scoreAlert',S.settings.locked?'🔒 Entries are now locked':'🔓 Entries are now open','ok');
 }
@@ -1842,20 +1929,38 @@ function populateSels(){
     sel.innerHTML='<option value="">—</option>'+S.players[tk].map(p=>`<option value="${p}">${p}</option>`).join('');
   });
 }
-function addEntry(){
+async function addEntry(){
   const name=document.getElementById('entryName').value.trim();
   if(!name){showAlert('addAlert','Please enter a name.','err');return;}
   if(S.entries.find(e=>e.name.toLowerCase()===name.toLowerCase())){showAlert('addAlert','That name is already in the pool.','err');return;}
   const picks=TKEYS.map((_,i)=>document.getElementById('pick'+i)?.value||'');
   const wc1=document.getElementById('pick4')?.value.trim()||'';
   const wc2=document.getElementById('pick5')?.value.trim()||'';
-  const allPicks=[...picks,wc1,wc2];
+  const allPicks=[...picks.slice(0,4),wc1,wc2];
   if(allPicks.some(p=>!p)){showAlert('addAlert','Please select a player for every tier.','err');return;}
   if(new Set(allPicks).size<6){showAlert('addAlert','All picks must be different players.','err');return;}
-  S.entries.push({name,picks:allPicks,tbGuess:null});save();renderAll();renderAdmin();updatePrizePool();
-  showAlert('addAlert','✓ '+name+' added!','ok');
+  const entry={name,picks:allPicks,tbGuess:null};
+  try{
+    await saveEntry(entry);
+    S.entries.push(entry);
+    save();renderAll();renderAdmin();updatePrizePool();
+    showAlert('addAlert','✓ '+name+' added!','ok');
+    document.getElementById('entryName').value='';
+  }catch(e){
+    showAlert('addAlert','Error saving entry: '+e.message,'err');
+  }
 }
-function removeEntry(idx){if(!confirm('Remove this entry?'))return;S.entries.splice(idx,1);save();renderAll();renderAdmin();updatePrizePool();}
+async function removeEntry(idx){
+  if(!confirm('Remove this entry?'))return;
+  const entry=S.entries[idx];
+  try{
+    if(entry.id) await deleteEntry(entry.id);
+    S.entries.splice(idx,1);
+    save();renderAll();renderAdmin();updatePrizePool();
+  }catch(e){
+    showAlert('addAlert','Error removing entry.','err');
+  }
+}
 function addPlayer(){
   const ti=Number(document.getElementById('npt').value);
   const name=document.getElementById('npn').value.trim();
@@ -1911,7 +2016,7 @@ function pickSel(slot,el){
   document.querySelectorAll(`.pbtn[data-slot="${slot}"]`).forEach(b=>b.classList.remove('sel'));
   ePicks[slot]=el.dataset.p;el.classList.add('sel');
 }
-function submitEntry(){
+async function submitEntry(){
   const name=document.getElementById('enterName').value.trim();
   if(!name){showAlert('enterAlert','Please enter your name.','err');return;}
   if(ePicks.some(p=>!p)){showAlert('enterAlert','Please pick one player from every tier.','err');return;}
@@ -1920,12 +2025,26 @@ function submitEntry(){
   if(S.settings.locked){showAlert('enterAlert','Entries are locked — the pool is closed.','err');return;}
   const tbRaw=document.getElementById('tbGuess')?.value;
   const tbGuess=tbRaw!==''&&tbRaw!==undefined?Number(tbRaw):null;
-  S.entries.push({name,picks:[...ePicks],tbGuess});save();renderAll();
-  document.getElementById('successName').textContent='Welcome, '+name+'! You\'re in the pool.';
-  showConfirmationPicks([...ePicks]);
-  updateShareUrls();updatePrizePool();
-  document.getElementById('enterForm').style.display='none';
-  document.getElementById('enterSuccess').style.display='block';
+  const entry={name,picks:[...ePicks],tbGuess};
+  // Save to Supabase
+  try{
+    document.getElementById('submitBtn').disabled=true;
+    document.getElementById('submitBtn').textContent='Saving...';
+    await saveEntry(entry);
+    S.entries.push(entry);
+    renderAll();
+    document.getElementById('successName').textContent='Welcome, '+name+'! You\'re in the pool.';
+    showConfirmationPicks([...ePicks]);
+    updateShareUrls();updatePrizePool();
+    document.getElementById('enterForm').style.display='none';
+    document.getElementById('enterSuccess').style.display='block';
+  }catch(e){
+    showAlert('enterAlert','Error saving entry. Please try again.','err');
+    console.error(e);
+  }finally{
+    document.getElementById('submitBtn').disabled=false;
+    document.getElementById('submitBtn').textContent='🏌️ Submit My Entry';
+  }
 }
 function showConfirmationPicks(picks){
   const grid=document.getElementById('confPicksGrid');if(!grid)return;
@@ -2017,9 +2136,11 @@ function renderAll(){renderLB();renderScores();loadAugustaScoreboard();}
 function showAlert(id,msg,type){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='alert '+type+' show';setTimeout(()=>el.classList.remove('show'),4000);}
 
 // ── INIT ──
-function init(){
-  load();
-  if(!S.entries.length&&!S.players.favorites.length)seed();
+async function init(){
+  // Load from Supabase first
+  await loadFromSupabase();
+  if(!S.players.favorites.length)seed();
+
   document.getElementById('activeRound').value=S.settings.activeRound;
   buildTourneyFieldFromPool();
   renderAll();
@@ -2028,6 +2149,10 @@ function init(){
   handleUrlParams();
   updateShareUrls();
   if(S.settings.locked)updateLockNavIndicator();
+
+  // Subscribe to realtime updates
+  subscribeToChanges();
+  console.log('Masters Pool 2026 loaded with',S.entries.length,'entries');
 }
 init();
 </script>
