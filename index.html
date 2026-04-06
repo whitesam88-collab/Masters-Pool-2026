@@ -142,46 +142,412 @@ input,select{font-family:inherit}
 .tb-card input:focus{border-color:var(--gold)}
 .tie-badge{display:inline-block;font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;background:var(--gold-p);color:var(--gold);border:1px solid var(--gold);border-radius:3px;padding:1px 5px;margin-left:5px;vertical-align:middle}
 
-/* ── AUGUSTA SCOREBOARD ── */
-.sb-wrap{background:#111;padding:8px 8px 12px;border-radius:4px;max-width:860px;margin:0 auto}
-.sb-board{background:#f0ede0;border:3px solid #555;font-family:'Oswald',sans-serif;overflow:hidden}
-.sb-leaders{background:#f5d300;border-bottom:3px solid #1a3c2e;display:flex;align-items:center;justify-content:center;position:relative;padding:8px 12px}
-.sb-leaders-text{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;letter-spacing:10px;text-transform:uppercase;color:#111;text-align:center}
-.sb-round-pills{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;gap:4px;align-items:center}
-.sb-pill{padding:3px 9px;font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:1px solid rgba(0,0,0,0.3);background:rgba(255,255,255,0.55);color:#222;font-weight:600;transition:all 0.12s}
-.sb-pill.on{background:#1a3c2e;color:#f5d300;border-color:#1a3c2e}
-.sb-col-hdr{display:grid;grid-template-columns:52px 1fr 72px 72px 72px 84px;background:#1a3c2e;border-bottom:2px solid #0f2a1e}
-.sb-ch{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#f5d300;text-align:center;padding:7px 4px;line-height:1}
-.sb-ch.nm{text-align:left;padding-left:10px}
-.sb-row{display:grid;grid-template-columns:52px 1fr 72px 72px 72px 84px;border-bottom:1px solid #b8b49c;background:#f0ede0;align-items:stretch}
-.sb-row:nth-child(even){background:#e6e3ce}
-.sb-row:last-child{border-bottom:none}
-.sb-pos{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:center;border-right:1px solid #b8b49c;padding:0 4px;min-height:40px}
-.sb-pos.top{color:#1a3c2e;font-size:15px;font-weight:700}
-.sb-cut-badge-cell{font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#888;background:#ddd;border:1px solid #bbb;padding:2px 4px;border-radius:1px;display:flex;align-items:center;justify-content:center;margin:8px 4px}
-.sb-name{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.5px;color:#111;padding:0 8px 0 10px;display:flex;align-items:center;border-right:1px solid #b8b49c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:40px}
-.sb-name.pool{color:#1a3c2e}
-.sb-name.cut-n{color:#999;font-weight:400}
-.pool-dot{width:7px;height:7px;border-radius:50%;background:#1a3c2e;flex-shrink:0;margin-left:6px}
-.pool-dot.faded{background:#aaa}
-.sb-sc{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;border-right:1px solid #b8b49c;color:#111;padding:0 4px}
-.sb-sc.red{color:#cc0000}
-.sb-sc.grey{color:#aaa;font-weight:400}
-.sb-tot{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#111;padding:0 6px}
-.sb-tot.red{color:#cc0000}
-.sb-tot.grey{color:#aaa}
-.sb-tot.leader{background:#f5d300;color:#111;margin:5px;border-radius:2px;font-size:15px}
-.sb-cut-bar{background:#1a3c2e;display:flex;align-items:center;justify-content:center;padding:5px 10px;border-top:2px solid #0f2a1e;border-bottom:1px solid #0f2a1e}
-.sb-cut-lbl{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#f5d300;font-weight:600}
-.sb-loading{background:#f0ede0;text-align:center;padding:40px 0}
-.sb-spin{display:inline-block;width:28px;height:28px;border:3px solid #c8c4a8;border-top-color:#1a3c2e;border-radius:50%;animation:sbspin 0.7s linear infinite;margin-bottom:10px}
-@keyframes sbspin{to{transform:rotate(360deg)}}
-.sb-loading p{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#aaa;font-family:'Oswald',sans-serif}
-.sb-footer{background:#1a3c2e;display:flex;align-items:center;justify-content:space-between;padding:6px 14px;border-top:2px solid #0f2a1e}
-.sb-footer-txt{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,211,0,0.45);font-family:'Oswald',sans-serif}
-.sb-footer button{background:transparent;border:1px solid rgba(245,211,0,0.4);color:#f5d300;padding:4px 14px;font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer}
-.sb-footer button:hover{background:rgba(245,211,0,0.1);border-color:#f5d300}
-.sb-legend{margin-top:6px;text-align:right;padding-right:2px;font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:flex-end;gap:6px}
+/* ── AUGUSTA SCOREBOARD - 3D FLIP CARD DESIGN ── */
+#tab-scores{background:url('augusta-bg.jpg') center center/cover no-repeat fixed;min-height:100vh;padding-bottom:80px}
+.augusta-container{padding:40px 15px;display:flex;justify-content:center;align-items:flex-start;perspective:1200px}
+
+/* Main board frame - heavy wood frame with 3D depth */
+.augusta-board{
+  position:relative;
+  max-width:1050px;
+  width:100%;
+  transform-style:preserve-3d;
+  transform:rotateX(2deg);
+}
+
+/* Outer wood frame with deep 3D bevel */
+.augusta-board::before{
+  content:'';
+  position:absolute;
+  inset:-12px;
+  background:linear-gradient(145deg,#2a5f3a 0%,#1a4a2a 20%,#0d3518 80%,#061f0d 100%);
+  border-radius:24px;
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.6),
+    0 15px 30px rgba(0,0,0,0.4),
+    inset 0 2px 4px rgba(255,255,255,0.1),
+    inset 0 -4px 8px rgba(0,0,0,0.3);
+  z-index:-1;
+  border:3px solid #0a2912;
+}
+
+/* Arched header - iconic Masters green arch */
+.augusta-header{
+  position:relative;
+  background:linear-gradient(180deg,#2d6b3d 0%,#1f5a2d 30%,#165522 70%,#0d4018 100%);
+  padding:20px 40px 16px;
+  text-align:center;
+  border-radius:120px 120px 0 0;
+  margin:-8px -8px 0 -8px;
+  box-shadow:
+    inset 0 6px 12px rgba(255,255,255,0.15),
+    inset 0 -4px 10px rgba(0,0,0,0.25),
+    0 4px 8px rgba(0,0,0,0.3);
+  border:4px solid #0a2912;
+  border-bottom:none;
+}
+.augusta-header::before{
+  content:'';
+  position:absolute;
+  top:10px;left:50%;transform:translateX(-50%);
+  width:50%;height:4px;
+  background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.5) 30%,rgba(212,175,55,0.7) 50%,rgba(212,175,55,0.5) 70%,transparent 100%);
+  border-radius:2px;
+}
+.augusta-header::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:50%;transform:translateX(-50%);
+  width:80%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,0,0,0.3),transparent);
+}
+.augusta-header h2{
+  font-family:'Times New Roman',Georgia,serif;
+  font-size:36px;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:14px;
+  margin:0;
+  text-shadow:
+    0 3px 6px rgba(0,0,0,0.4),
+    0 1px 2px rgba(0,0,0,0.3),
+    0 0 30px rgba(212,175,55,0.3);
+}
+
+/* Round selector buttons */
+.augusta-rounds{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:12px;
+}
+.aug-round-btn{
+  background:linear-gradient(180deg,rgba(255,255,255,0.15) 0%,rgba(255,255,255,0.05) 100%);
+  border:1px solid rgba(212,175,55,0.3);
+  color:rgba(255,255,255,0.7);
+  padding:6px 14px;
+  font-family:'Oswald',sans-serif;
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:2px;
+  cursor:pointer;
+  border-radius:20px;
+  transition:all 0.2s;
+  box-shadow:0 2px 4px rgba(0,0,0,0.2);
+}
+.aug-round-btn:hover{
+  background:linear-gradient(180deg,rgba(255,255,255,0.25) 0%,rgba(255,255,255,0.1) 100%);
+  border-color:rgba(212,175,55,0.5);
+  color:#fff;
+}
+.aug-round-btn.active{
+  background:linear-gradient(180deg,#d4af37 0%,#b8962e 100%);
+  border-color:#d4af37;
+  color:#0d3518;
+  font-weight:600;
+  box-shadow:0 2px 8px rgba(212,175,55,0.4);
+}
+
+/* Inner board - recessed panel area */
+.augusta-inner{
+  background:#1a4528;
+  border-radius:0 0 16px 16px;
+  padding:6px;
+  box-shadow:inset 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Scoreboard panel - cream background for cards */
+.augusta-panel{
+  background:linear-gradient(180deg,#d4cfc2 0%,#c8c3b6 100%);
+  border-radius:0 0 10px 10px;
+  padding:3px;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Table styling */
+.augusta-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:2px;
+  font-family:'Oswald','Arial Narrow',sans-serif;
+  background:#8b8578;
+}
+
+/* Header row - metal plate look */
+.augusta-table thead tr{background:transparent}
+.augusta-table th{
+  padding:5px 2px;
+  height:26px;
+  text-align:center;
+  font-size:9px;
+  font-weight:700;
+  color:#1a1a1a;
+  letter-spacing:0.5px;
+  background:linear-gradient(180deg,#e8e4d9 0%,#d5d0c3 50%,#c8c3b6 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 2px rgba(0,0,0,0.1),
+    0 1px 2px rgba(0,0,0,0.2);
+  border-radius:2px;
+}
+
+/* Individual flip card cells - the key 3D effect */
+.augusta-table td{
+  padding:0;
+  height:36px;
+  text-align:center;
+  font-size:15px;
+  font-weight:600;
+  color:#1a1a1a;
+  background:linear-gradient(180deg,
+    #faf8f2 0%,
+    #f5f2ea 15%,
+    #f0ede5 50%,
+    #e8e5dc 85%,
+    #e0ddd4 100%
+  );
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.9),
+    inset 0 -2px 3px rgba(0,0,0,0.08),
+    inset 2px 0 3px rgba(0,0,0,0.03),
+    inset -2px 0 3px rgba(0,0,0,0.03),
+    0 2px 4px rgba(0,0,0,0.25),
+    0 1px 2px rgba(0,0,0,0.15);
+  border-radius:3px;
+  position:relative;
+  transform-style:preserve-3d;
+}
+/* Horizontal split line on each card (flip board effect) */
+.augusta-table td::after{
+  content:'';
+  position:absolute;
+  left:2px;right:2px;top:50%;
+  height:1px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,0,0,0.08) 10%,
+    rgba(0,0,0,0.12) 50%,
+    rgba(0,0,0,0.08) 90%,
+    transparent 100%
+  );
+  box-shadow:0 1px 0 rgba(255,255,255,0.5);
+}
+
+/* SCORE column - left side, larger */
+.augusta-table .col-score{
+  width:54px;
+  font-size:20px;
+  font-weight:700;
+  background:linear-gradient(180deg,
+    #f8f5ed 0%,
+    #f2efe6 15%,
+    #ebe8df 50%,
+    #e3e0d6 85%,
+    #dbd8ce 100%
+  );
+}
+.augusta-table th.col-score{font-size:10px;font-weight:700}
+
+/* PLAYER NAME column */
+.augusta-table .col-name{
+  width:140px;
+  text-align:left;
+  padding-left:10px;
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:0.5px;
+  background:linear-gradient(180deg,
+    #f8f5ed 0%,
+    #f2efe6 15%,
+    #ebe8df 50%,
+    #e3e0d6 85%,
+    #dbd8ce 100%
+  );
+}
+.augusta-table th.col-name{text-align:left;padding-left:10px;font-size:10px}
+
+/* Hole number columns */
+.augusta-table .col-hole{width:34px}
+
+/* THRU column - right side */
+.augusta-table .col-thru{
+  width:44px;
+  font-weight:700;
+  font-size:12px;
+  background:linear-gradient(180deg,
+    #f8f5ed 0%,
+    #f2efe6 15%,
+    #ebe8df 50%,
+    #e3e0d6 85%,
+    #dbd8ce 100%
+  );
+}
+
+/* Green divider columns */
+.augusta-table .col-score{box-shadow:
+  inset 0 2px 0 rgba(255,255,255,0.9),
+  inset 0 -2px 3px rgba(0,0,0,0.08),
+  0 2px 4px rgba(0,0,0,0.25),
+  4px 0 0 #1a4528;
+}
+.augusta-table .col-name{box-shadow:
+  inset 0 2px 0 rgba(255,255,255,0.9),
+  inset 0 -2px 3px rgba(0,0,0,0.08),
+  0 2px 4px rgba(0,0,0,0.25),
+  4px 0 0 #1a4528;
+}
+.augusta-table .col-thru{box-shadow:
+  inset 0 2px 0 rgba(255,255,255,0.9),
+  inset 0 -2px 3px rgba(0,0,0,0.08),
+  0 2px 4px rgba(0,0,0,0.25),
+  -4px 0 0 #1a4528;
+}
+
+/* Score colors - RED for under par (Augusta signature) */
+.augusta-table .score-under{color:#c41e3a}
+.augusta-table .score-over{color:#1a1a1a}
+.augusta-table .score-even{color:#1a1a1a}
+.augusta-table .player-name{color:#0d3518;text-transform:uppercase;font-size:10px}
+
+/* Birdie/Eagle - red numbers */
+.augusta-table .birdie{color:#c41e3a}
+.augusta-table .eagle{color:#c41e3a;font-weight:700}
+.augusta-table .bogey{color:#1a1a1a}
+.augusta-table .double{color:#555}
+
+/* Footer bar */
+.augusta-footer{
+  background:linear-gradient(180deg,#1f5528 0%,#164420 50%,#0d3518 100%);
+  padding:10px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:6px -6px -6px -6px;
+  border-radius:0 0 10px 10px;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,0.2);
+}
+.augusta-footer span{color:rgba(255,255,255,0.5);font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:1px}
+.augusta-footer button{
+  background:linear-gradient(180deg,#2a6b3a 0%,#1f5528 100%);
+  border:1px solid rgba(212,175,55,0.4);
+  color:#d4af37;
+  padding:6px 14px;
+  font-family:'Oswald',sans-serif;
+  font-size:10px;
+  letter-spacing:1.5px;
+  cursor:pointer;
+  border-radius:4px;
+  box-shadow:0 2px 4px rgba(0,0,0,0.3);
+  transition:all 0.2s;
+}
+.augusta-footer button:hover{background:linear-gradient(180deg,#3a7b4a 0%,#2a6538 100%);border-color:#d4af37}
+
+/* Projected Cut Line */
+.augusta-cut-line{
+  background:linear-gradient(180deg,#d4af37 0%,#b8962e 50%,#a6852a 100%);
+  padding:8px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:0 -6px;
+  box-shadow:inset 0 2px 4px rgba(255,255,255,0.3),inset 0 -2px 4px rgba(0,0,0,0.2),0 2px 4px rgba(0,0,0,0.2);
+}
+.cut-label{
+  font-family:'Oswald',sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:2px;
+  color:#0d3518;
+}
+.cut-value{
+  font-family:'Oswald',sans-serif;
+  font-size:18px;
+  font-weight:700;
+  color:#0d3518;
+  text-shadow:0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Enhanced THRU column */
+.augusta-table .col-thru{
+  background:linear-gradient(180deg,#1a4528 0%,#0d3518 100%)!important;
+  color:#fff!important;
+  font-weight:700;
+  font-size:11px;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.1),
+    inset 0 -2px 3px rgba(0,0,0,0.2),
+    0 2px 4px rgba(0,0,0,0.25);
+}
+.augusta-table th.col-thru{
+  background:linear-gradient(180deg,#2a5f3a 0%,#1a4528 100%)!important;
+  color:#d4af37!important;
+}
+
+/* Card Flip Animation */
+@keyframes cardFlip{
+  0%{transform:rotateX(0deg)}
+  50%{transform:rotateX(90deg)}
+  100%{transform:rotateX(0deg)}
+}
+.augusta-table td{
+  transform-style:preserve-3d;
+  transition:transform 0.1s ease;
+}
+.augusta-table td.flipping{
+  animation:cardFlip 0.4s ease-in-out;
+}
+.augusta-table td:active{
+  transform:rotateX(15deg);
+}
+/* Hover effect - subtle lift */
+.augusta-table tbody tr:hover td{
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.95),
+    inset 0 -2px 3px rgba(0,0,0,0.1),
+    inset 2px 0 3px rgba(0,0,0,0.05),
+    inset -2px 0 3px rgba(0,0,0,0.05),
+    0 4px 8px rgba(0,0,0,0.35),
+    0 2px 4px rgba(0,0,0,0.2);
+  transform:translateY(-1px);
+}
+
+/* Legend */
+.augusta-legend{
+  text-align:center;
+  padding:18px;
+  color:rgba(255,255,255,0.9);
+  font-family:'Oswald',sans-serif;
+  font-size:12px;
+  letter-spacing:2px;
+  text-shadow:0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* Loading */
+.augusta-loading{
+  padding:80px;
+  text-align:center;
+  color:#666;
+  font-family:'Oswald',sans-serif;
+  font-size:12px;
+  letter-spacing:2px;
+  background:linear-gradient(180deg,#f5f2ea 0%,#e8e5dc 100%);
+  border-radius:0 0 10px 10px;
+}
+
+/* Responsive */
+@media(max-width:950px){
+  .augusta-board{transform:rotateX(0)}
+  .augusta-board::before{inset:-8px;border-radius:16px}
+  .augusta-header{border-radius:80px 80px 0 0;padding:14px 20px 12px}
+  .augusta-header h2{font-size:22px;letter-spacing:8px}
+  .augusta-table{border-spacing:1px}
+  .augusta-table th{height:22px;font-size:8px}
+  .augusta-table td{height:30px;font-size:12px}
+  .augusta-table .col-score{width:40px;font-size:14px}
+  .augusta-table .col-name{width:90px;font-size:10px;padding-left:6px}
+  .augusta-table .col-hole{width:26px}
+  .augusta-table .col-thru{width:36px;font-size:10px}
+}
 
 /* ── ENTER POOL ── */
 .enter-wrap{max-width:660px;margin:0 auto}
@@ -415,34 +781,61 @@ input,select{font-family:inherit}
 
   <!-- FIELD SCORES TAB -->
   <div id="tab-scores" class="tab-content">
-    <div class="sb-wrap">
-      <div class="sb-board">
-        <div class="sb-leaders">
-          <div class="sb-leaders-text">L E A D E R S</div>
-          <div class="sb-round-pills">
-            <button class="sb-pill" onclick="setBoardRound(1,this)">R1</button>
-            <button class="sb-pill" onclick="setBoardRound(2,this)">R2</button>
-            <button class="sb-pill" onclick="setBoardRound(3,this)">R3</button>
-            <button class="sb-pill" onclick="setBoardRound(4,this)">R4</button>
-            <button class="sb-pill on" onclick="setBoardRound(0,this)">Total</button>
+    <div class="augusta-container">
+      <div class="augusta-board">
+        <div class="augusta-header">
+          <h2>L E A D E R S</h2>
+          <div class="augusta-rounds">
+            <button class="aug-round-btn" onclick="setAugustaRound(1,this)">R1</button>
+            <button class="aug-round-btn" onclick="setAugustaRound(2,this)">R2</button>
+            <button class="aug-round-btn" onclick="setAugustaRound(3,this)">R3</button>
+            <button class="aug-round-btn" onclick="setAugustaRound(4,this)">R4</button>
+            <button class="aug-round-btn active" onclick="setAugustaRound(0,this)">TOTAL</button>
           </div>
         </div>
-        <div class="sb-col-hdr">
-          <div class="sb-ch">Pos</div>
-          <div class="sb-ch nm">Player</div>
-          <div class="sb-ch sb-r1-hide">R1</div>
-          <div class="sb-ch sb-r2-hide">R2</div>
-          <div class="sb-ch">R3</div>
-          <div class="sb-ch">Total</div>
-        </div>
-        <div id="scoresGrid"></div>
-        <div class="sb-footer">
-          <span class="sb-footer-txt" id="boardSyncTime">—</span>
-          <button onclick="manualRefresh()">&#8635; Refresh</button>
+        <div class="augusta-inner">
+          <div class="augusta-panel">
+            <table class="augusta-table">
+              <thead>
+                <tr>
+                  <th class="col-score">SCORE</th>
+                  <th class="col-name">PLAYER</th>
+                  <th class="col-hole">1</th>
+                  <th class="col-hole">2</th>
+                  <th class="col-hole">3</th>
+                  <th class="col-hole">4</th>
+                  <th class="col-hole">5</th>
+                  <th class="col-hole">6</th>
+                  <th class="col-hole">7</th>
+                  <th class="col-hole">8</th>
+                  <th class="col-hole">9</th>
+                  <th class="col-hole">10</th>
+                  <th class="col-hole">11</th>
+                  <th class="col-hole">12</th>
+                  <th class="col-hole">13</th>
+                  <th class="col-hole">14</th>
+                  <th class="col-hole">15</th>
+                  <th class="col-hole">16</th>
+                  <th class="col-hole">17</th>
+                  <th class="col-hole">18</th>
+                  <th class="col-thru">THRU</th>
+                </tr>
+              </thead>
+              <tbody id="augustaScoreboard"></tbody>
+            </table>
+          </div>
+          <div class="augusta-cut-line">
+            <span class="cut-label">PROJECTED CUT</span>
+            <span class="cut-value" id="projectedCut">+3</span>
+          </div>
+          <div class="augusta-footer">
+            <span id="augustaSyncTime">—</span>
+            <button onclick="loadAugustaScoreboard()">↻ REFRESH</button>
+          </div>
         </div>
       </div>
-      <div class="sb-legend"><span class="pool-dot"></span>In your pool</div>
     </div>
+    <div class="augusta-legend">RED = Under Par &nbsp;|&nbsp; THRU = Holes Completed &nbsp;|&nbsp; Tap scores to see flip animation</div>
   </div>
 
   <!-- ENTER POOL TAB -->
@@ -1024,6 +1417,211 @@ function buildTourneyFieldFromPool(){
   });
 }
 
+// ── AUGUSTA SCOREBOARD ──
+const AUGUSTA_PAR=[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4];
+let augustaPlayers=[];
+let augustaRound=0; // 0=Total, 1-4=Round
+let augustaAllRoundsData={}; // Store all rounds data per player
+
+function setAugustaRound(round,btn){
+  augustaRound=round;
+  document.querySelectorAll('.aug-round-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  // Trigger cascading flip animation then render
+  const cells=document.querySelectorAll('.augusta-table tbody td');
+  if(cells.length>0){
+    cells.forEach((td,i)=>{
+      setTimeout(()=>td.classList.add('flipping'),i*8);
+    });
+    setTimeout(()=>{
+      renderAugustaBoard();
+    },200);
+  }else{
+    renderAugustaBoard();
+  }
+}
+
+async function loadAugustaScoreboard(){
+  const tbody=document.getElementById('augustaScoreboard');
+  if(!tbody)return;
+  tbody.innerHTML='<tr><td colspan="21" class="augusta-loading">Loading scoreboard...</td></tr>';
+
+  // Fetch main leaderboard first
+  const urls=['https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard?event=401703512','https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard'];
+  let data=null;
+  for(const u of urls){try{const r=await fetch(u);if(r.ok){data=await r.json();break;}}catch(e){}}
+
+  if(!data||!data.events?.[0]?.competitions?.[0]?.competitors){
+    renderAugustaDummy();
+    return;
+  }
+
+  const comps=data.events[0].competitions[0].competitors;
+  const top15=comps.slice(0,15);
+
+  // Fetch hole-by-hole for each player (all rounds)
+  augustaPlayers=[];
+  for(const c of top15){
+    const id=c.athlete?.id;
+    const name=c.athlete?.displayName||'Unknown';
+    const totalScore=c.score?.displayValue||'E';
+    const thru=c.status?.thru||'F';
+    let allRounds={1:Array(18).fill(''),2:Array(18).fill(''),3:Array(18).fill(''),4:Array(18).fill('')};
+    let roundScores={1:null,2:null,3:null,4:null};
+
+    if(id){
+      try{
+        const detailUrl=`https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard/${data.events[0].id}/competitorsummary/${id}`;
+        const dr=await fetch(detailUrl);
+        if(dr.ok){
+          const dd=await dr.json();
+          const rounds=dd.rounds||[];
+          rounds.forEach((rd,idx)=>{
+            const rNum=idx+1;
+            if(rd.linescores){
+              rd.linescores.forEach((ls,i)=>{
+                if(i<18&&ls.value!==undefined)allRounds[rNum][i]=ls.value;
+              });
+            }
+            if(rd.displayValue)roundScores[rNum]=rd.displayValue;
+          });
+        }
+      }catch(e){}
+    }
+    augustaPlayers.push({name,totalScore,thru,allRounds,roundScores});
+  }
+
+  renderAugustaBoard();
+}
+
+function renderAugustaDummy(){
+  const dummyData=[
+    {name:'Scottie Scheffler',totalScore:'-10',thru:'F',
+      allRounds:{1:[4,4,3,3,4,3,4,5,3,4,4,2,4,4,5,3,4,4],2:[4,5,4,3,4,2,4,4,4,4,4,3,4,4,5,3,4,4],3:[3,5,4,3,4,3,4,5,4,4,4,3,5,4,4,3,4,4],4:[4,4,4,3,4,3,4,5,4,4,3,3,5,4,5,3,4,4]},
+      roundScores:{1:'-4',2:'-3',3:'-1',4:'-2'}},
+    {name:'Xander Schauffele',totalScore:'-8',thru:'F',
+      allRounds:{1:[4,5,4,3,3,3,4,4,4,4,4,3,4,4,5,3,4,4],2:[4,5,4,3,4,3,3,5,4,4,4,3,5,4,5,2,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,4,4,5,3,4,4],4:[4,4,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,3]},
+      roundScores:{1:'-3',2:'-2',3:'E',4:'-3'}},
+    {name:'Rory McIlroy',totalScore:'-7',thru:'F',
+      allRounds:{1:[3,5,4,3,4,2,4,5,4,4,4,3,5,3,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,4,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,3,4,4,3,5,4,5,3,4,4],4:[4,5,4,3,4,3,4,4,4,4,4,3,5,4,5,3,4,4]},
+      roundScores:{1:'-4',2:'E',3:'-1',4:'-2'}},
+    {name:'Collin Morikawa',totalScore:'-6',thru:'12',
+      allRounds:{1:[4,4,4,3,4,3,4,4,4,3,4,3,5,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,4,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,'','','','','',''],4:Array(18).fill('')},
+      roundScores:{1:'-2',2:'E',3:'-4',4:null}},
+    {name:'Ludvig Aberg',totalScore:'-5',thru:'F',
+      allRounds:{1:[4,5,4,3,4,3,4,5,4,4,3,3,5,4,4,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,3,4],4:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4]},
+      roundScores:{1:'-2',2:'E',3:'-1',4:'-2'}},
+    {name:'Jon Rahm',totalScore:'-5',thru:'F',
+      allRounds:{1:[4,5,4,2,4,3,4,5,4,4,4,3,4,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,2,5,4,5,3,4,4],4:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,3]},
+      roundScores:{1:'-2',2:'E',3:'-1',4:'-2'}},
+    {name:'Viktor Hovland',totalScore:'-4',thru:'10',
+      allRounds:{1:[4,5,3,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,'','','','','','','',''],4:Array(18).fill('')},
+      roundScores:{1:'-1',2:'E',3:'-3',4:null}},
+    {name:'Brooks Koepka',totalScore:'-4',thru:'F',
+      allRounds:{1:[4,5,4,3,4,3,3,5,4,4,4,3,4,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],4:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,3]},
+      roundScores:{1:'-2',2:'E',3:'E',4:'-2'}},
+    {name:'Justin Thomas',totalScore:'-3',thru:'F',
+      allRounds:{1:[4,5,4,3,4,3,4,5,4,3,4,3,5,4,5,3,4,3],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],4:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4]},
+      roundScores:{1:'-3',2:'E',3:'E',4:'E'}},
+    {name:'Tommy Fleetwood',totalScore:'-2',thru:'8',
+      allRounds:{1:[4,4,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,4,4,3,4,3,4,5,'','','','','','','','','',''],4:Array(18).fill('')},
+      roundScores:{1:'-1',2:'E',3:'-1',4:null}},
+  ];
+  augustaPlayers=dummyData;
+  renderAugustaBoard();
+  const st=document.getElementById('augustaSyncTime');
+  if(st)st.textContent='Demo data — tap refresh for live scores';
+}
+
+function renderAugustaBoard(){
+  const tbody=document.getElementById('augustaScoreboard');
+  if(!tbody)return;
+
+  let html='';
+  augustaPlayers.forEach(p=>{
+    // Get score and holes based on selected round
+    let displayScore, displayHoles, displayThru;
+
+    if(augustaRound===0){
+      // Total view - show total score and current round holes
+      displayScore=p.totalScore;
+      displayThru=p.thru;
+      // Find the current round (last one with data)
+      for(let r=4;r>=1;r--){
+        if(p.allRounds[r].some(h=>h!=='')){
+          displayHoles=p.allRounds[r];
+          break;
+        }
+      }
+      if(!displayHoles)displayHoles=p.allRounds[1];
+    }else{
+      // Specific round view
+      displayScore=p.roundScores[augustaRound]||'-';
+      displayHoles=p.allRounds[augustaRound];
+      displayThru=displayHoles.filter(h=>h!=='').length===18?'F':displayHoles.filter(h=>h!=='').length||'-';
+    }
+
+    const scoreNum=displayScore==='E'?0:(displayScore==='-'?999:parseInt(displayScore));
+    const scoreCls=scoreNum<0?'score-under':scoreNum===0?'score-even':'score-over';
+
+    html+=`<tr>
+      <td class="col-score ${scoreCls}">${displayScore}</td>
+      <td class="col-name player-name">${p.name.toUpperCase()}</td>`;
+
+    for(let i=0;i<18;i++){
+      const stroke=displayHoles[i];
+      if(stroke===''||stroke===undefined)html+=`<td class="col-hole">-</td>`;
+      else{
+        const par=AUGUSTA_PAR[i];
+        const diff=stroke-par;
+        let cls='';
+        if(diff<=-2)cls='eagle';
+        else if(diff===-1)cls='birdie';
+        else if(diff===1)cls='bogey';
+        else if(diff>=2)cls='double';
+        html+=`<td class="col-hole ${cls}">${stroke}</td>`;
+      }
+    }
+
+    html+=`<td class="col-thru">${displayThru}</td></tr>`;
+  });
+
+  tbody.innerHTML=html;
+
+  // Add click handlers for flip animation
+  tbody.querySelectorAll('td').forEach(td=>{
+    td.addEventListener('click',()=>{
+      td.classList.add('flipping');
+      setTimeout(()=>td.classList.remove('flipping'),400);
+    });
+  });
+
+  // Update projected cut (calculate from data or use default)
+  const cutEl=document.getElementById('projectedCut');
+  if(cutEl&&augustaPlayers.length>0){
+    // Projected cut is typically around 50th place score after R2
+    // For demo, show a reasonable value based on top scores
+    const topScore=augustaPlayers[0]?.totalScore||'-10';
+    const topNum=topScore==='E'?0:parseInt(topScore);
+    const projCut=Math.min(topNum+13,5); // Usually ~13 shots worse than leader, max +5
+    cutEl.textContent=projCut===0?'E':projCut>0?'+'+projCut:String(projCut);
+  }
+
+  const st=document.getElementById('augustaSyncTime');
+  if(st)st.textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+
+// Trigger flip animation on round change
+function triggerBoardFlip(){
+  const cells=document.querySelectorAll('.augusta-table td');
+  cells.forEach((td,i)=>{
+    setTimeout(()=>{
+      td.classList.add('flipping');
+      setTimeout(()=>td.classList.remove('flipping'),400);
+    },i*15);
+  });
+}
+
 // ── ESPN ──
 async function fetchScores(){
   document.getElementById('syncTime').textContent='…';
@@ -1415,7 +2013,7 @@ function setMobileNav(id){
 }
 
 // ── HELPERS ──
-function renderAll(){renderLB();renderScores();}
+function renderAll(){renderLB();renderScores();loadAugustaScoreboard();}
 function showAlert(id,msg,type){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='alert '+type+' show';setTimeout(()=>el.classList.remove('show'),4000);}
 
 // ── INIT ──
