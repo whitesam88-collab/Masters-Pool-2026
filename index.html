@@ -2097,7 +2097,7 @@ async function submitEntry(){
     document.getElementById('submitBtn').textContent='Saving...';
     await saveEntry(entry);
     S.entries.push(entry);
-    renderAll();
+    // Show success screen immediately after save — before any other rendering
     document.getElementById('successName').textContent='Welcome, '+name+'! You\'re in the pool.';
     showConfirmationPicks([...ePicks]);
     updateShareUrls();updatePrizePool();
@@ -2105,6 +2105,8 @@ async function submitEntry(){
     const suc=document.getElementById('enterSuccess');
     suc.style.animation='none';suc.offsetHeight;suc.style.animation='';
     suc.style.display='block';
+    // Update rest of UI — errors here must not hide the confirmation
+    try{renderAll();}catch(re){console.error('renderAll error:',re);}
   }catch(e){
     showAlert('enterAlert','Error saving entry. Please try again.','err');
     console.error(e);
