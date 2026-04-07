@@ -1078,7 +1078,7 @@ const TMETA = [
 // ── SUPABASE CONFIG ──
 const SUPABASE_URL = 'https://ggclubyvmdfgoeeoiqhi.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdnY2x1Ynl2bWRmZ29lZW9pcWhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MTUxNDYsImV4cCI6MjA5MTA5MTE0Nn0.P96N4SfDT-TfcRTj5GXICt_DQalom68lwkGjGOqtiX8';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── STATE ──
 let S = {
@@ -1097,12 +1097,12 @@ let lbR=0, ePicks=[null,null,null,null,null,null];
 async function loadFromSupabase(){
   try{
     // Load entries from Supabase
-    const {data:entries, error:entriesErr} = await supabase.from('entries').select('*').order('created_at',{ascending:true});
+    const {data:entries, error:entriesErr} = await sb.from('entries').select('*').order('created_at',{ascending:true});
     if(!entriesErr && entries){
       S.entries = entries.map(e=>({id:e.id, name:e.name, picks:e.picks||[], tbGuess:e.tb_guess}));
     }
     // Load settings
-    const {data:settings, error:settingsErr} = await supabase.from('settings').select('*').eq('id',1).single();
+    const {data:settings, error:settingsErr} = await sb.from('settings').select('*').eq('id',1).single();
     if(!settingsErr && settings){
       S.settings.locked = settings.locked || false;
       S.settings.tbAnswer = settings.tb_answer;
@@ -1124,7 +1124,7 @@ async function loadFromSupabase(){
 
 async function saveEntry(entry){
   try{
-    const {data,error} = await supabase.from('entries').insert({
+    const {data,error} = await sb.from('entries').insert({
       name: entry.name,
       picks: entry.picks,
       tb_guess: entry.tbGuess
@@ -1137,7 +1137,7 @@ async function saveEntry(entry){
 
 async function updateEntry(entry){
   try{
-    const {error} = await supabase.from('entries').update({
+    const {error} = await sb.from('entries').update({
       picks: entry.picks,
       tb_guess: entry.tbGuess,
       updated_at: new Date().toISOString()
@@ -1148,14 +1148,14 @@ async function updateEntry(entry){
 
 async function deleteEntry(id){
   try{
-    const {error} = await supabase.from('entries').delete().eq('id', id);
+    const {error} = await sb.from('entries').delete().eq('id', id);
     if(error) throw error;
   }catch(e){console.error('Delete entry error:',e);}
 }
 
 async function saveSettings(){
   try{
-    await supabase.from('settings').update({
+    await sb.from('settings').update({
       locked: S.settings.locked,
       tb_answer: S.settings.tbAnswer,
       entry_fee: S.settings.entryFee,
@@ -1172,7 +1172,7 @@ function save(){saveLocal();} // Alias for compatibility
 
 // ── REALTIME SUBSCRIPTION ──
 function subscribeToChanges(){
-  supabase.channel('entries-changes')
+  sb.channel('entries-changes')
     .on('postgres_changes',{event:'*',schema:'public',table:'entries'},async(payload)=>{
       console.log('Realtime update:',payload);
       await loadFromSupabase();
