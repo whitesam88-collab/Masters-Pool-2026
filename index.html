@@ -1653,42 +1653,13 @@ async function loadAugustaScoreboard(){
 }
 
 function renderAugustaDummy(){
-  const dummyData=[
-    {name:'Scottie Scheffler',totalScore:'-10',thru:'F',
-      allRounds:{1:[4,4,3,3,4,3,4,5,3,4,4,2,4,4,5,3,4,4],2:[4,5,4,3,4,2,4,4,4,4,4,3,4,4,5,3,4,4],3:[3,5,4,3,4,3,4,5,4,4,4,3,5,4,4,3,4,4],4:[4,4,4,3,4,3,4,5,4,4,3,3,5,4,5,3,4,4]},
-      roundScores:{1:'-4',2:'-3',3:'-1',4:'-2'}},
-    {name:'Xander Schauffele',totalScore:'-8',thru:'F',
-      allRounds:{1:[4,5,4,3,3,3,4,4,4,4,4,3,4,4,5,3,4,4],2:[4,5,4,3,4,3,3,5,4,4,4,3,5,4,5,2,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,4,4,5,3,4,4],4:[4,4,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,3]},
-      roundScores:{1:'-3',2:'-2',3:'E',4:'-3'}},
-    {name:'Rory McIlroy',totalScore:'-7',thru:'F',
-      allRounds:{1:[3,5,4,3,4,2,4,5,4,4,4,3,5,3,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,4,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,3,4,4,3,5,4,5,3,4,4],4:[4,5,4,3,4,3,4,4,4,4,4,3,5,4,5,3,4,4]},
-      roundScores:{1:'-4',2:'E',3:'-1',4:'-2'}},
-    {name:'Collin Morikawa',totalScore:'-6',thru:'12',
-      allRounds:{1:[4,4,4,3,4,3,4,4,4,3,4,3,5,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,4,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,'','','','','',''],4:Array(18).fill('')},
-      roundScores:{1:'-2',2:'E',3:'-4',4:null}},
-    {name:'Ludvig Aberg',totalScore:'-5',thru:'F',
-      allRounds:{1:[4,5,4,3,4,3,4,5,4,4,3,3,5,4,4,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,3,4],4:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4]},
-      roundScores:{1:'-2',2:'E',3:'-1',4:'-2'}},
-    {name:'Jon Rahm',totalScore:'-5',thru:'F',
-      allRounds:{1:[4,5,4,2,4,3,4,5,4,4,4,3,4,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,2,5,4,5,3,4,4],4:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,3]},
-      roundScores:{1:'-2',2:'E',3:'-1',4:'-2'}},
-    {name:'Viktor Hovland',totalScore:'-4',thru:'10',
-      allRounds:{1:[4,5,3,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,'','','','','','','',''],4:Array(18).fill('')},
-      roundScores:{1:'-1',2:'E',3:'-3',4:null}},
-    {name:'Brooks Koepka',totalScore:'-4',thru:'F',
-      allRounds:{1:[4,5,4,3,4,3,3,5,4,4,4,3,4,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],4:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,3]},
-      roundScores:{1:'-2',2:'E',3:'E',4:'-2'}},
-    {name:'Justin Thomas',totalScore:'-3',thru:'F',
-      allRounds:{1:[4,5,4,3,4,3,4,5,4,3,4,3,5,4,5,3,4,3],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],4:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4]},
-      roundScores:{1:'-3',2:'E',3:'E',4:'E'}},
-    {name:'Tommy Fleetwood',totalScore:'-2',thru:'8',
-      allRounds:{1:[4,4,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],2:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],3:[4,4,4,3,4,3,4,5,'','','','','','','','','',''],4:Array(18).fill('')},
-      roundScores:{1:'-1',2:'E',3:'-1',4:null}},
-  ];
-  augustaPlayers=dummyData;
-  renderAugustaBoard();
+  augustaPlayers=[];
+  const tbody=document.getElementById('augustaScoreboard');
+  if(tbody){
+    tbody.innerHTML='<tr><td colspan="21" style="text-align:center;padding:40px;color:#6b7280;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;">Live scores will appear when the tournament begins.<br>Round 1 starts Thursday, April 10.</td></tr>';
+  }
   const st=document.getElementById('augustaSyncTime');
-  if(st)st.textContent='Demo data — tap refresh for live scores';
+  if(st)st.textContent='Waiting for tournament to begin';
 }
 
 function renderAugustaBoard(){
