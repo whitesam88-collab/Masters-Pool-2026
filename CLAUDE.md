@@ -6,8 +6,9 @@ A golf pool web app for The Masters tournament. Single-page HTML app with Supaba
 ## Tech Stack
 - **Frontend:** Single `index.html` file (vanilla HTML/CSS/JS)
 - **Backend:** Supabase (Postgres + Realtime)
-- **Hosting:** Vercel (auto-deploys on push to main)
-- **Live URL:** https://masters-pool-2026-tau.vercel.app/
+- **Hosting:** Netlify (auto-deploys on push to main)
+- **Live URL:** https://masters-pool-2026-948.netlify.app/
+- **Netlify Dashboard:** https://app.netlify.com/projects/masters-pool-2026-948
 
 ## Key Features
 - Pool leaderboard with scoring (top 4 of 6 picks count per round)
@@ -45,12 +46,12 @@ Look for `renderEnter()` function and `#tab-enter` HTML section
 
 ## Deployment
 ```bash
-vercel --prod
+npx netlify-cli deploy --prod
 ```
-Auto-deploys when pushing to `main` branch.
+Or just push to `main` branch — Netlify auto-deploys (once GitHub is linked in Netlify dashboard).
 
 ## Team
 - **Jaz** - Uses Claude Code CLI
-- **Partner** - Uses claude.ai/code (web)
+- **Sam (whitesam88-collab)** - Uses claude.ai/code (web), owns GitHub repo
 
-Both push to same GitHub repo, Vercel auto-deploys.
+Both push to same GitHub repo, Netlify auto-deploys.
