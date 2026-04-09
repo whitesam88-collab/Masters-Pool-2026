@@ -410,11 +410,15 @@ input,select{font-family:inherit}
 .augusta-table .score-even{color:#1a1a1a}
 .augusta-table .player-name{color:#0d3518;text-transform:uppercase;font-size:10px}
 
-/* Birdie/Eagle - red numbers */
-.augusta-table .birdie{color:#c41e3a}
-.augusta-table .eagle{color:#c41e3a;font-weight:700}
-.augusta-table .bogey{color:#1a1a1a}
-.augusta-table .double{color:#555}
+/* Score indicators - Augusta style circles/squares */
+.augusta-table .birdie{color:#c41e3a;position:relative}
+.augusta-table .birdie::after{content:'';position:absolute;inset:2px;border:2px solid #c41e3a;border-radius:50%;pointer-events:none}
+.augusta-table .eagle{color:#d4af37;font-weight:700;position:relative}
+.augusta-table .eagle::after{content:'';position:absolute;inset:1px;border:3px double #d4af37;border-radius:50%;pointer-events:none}
+.augusta-table .bogey{color:#1a4b8c;position:relative}
+.augusta-table .bogey::after{content:'';position:absolute;inset:3px;border:2px solid #1a4b8c;border-radius:2px;pointer-events:none}
+.augusta-table .double{color:#1a1a1a;position:relative;font-weight:700}
+.augusta-table .double::after{content:'';position:absolute;inset:2px;border:2px solid #1a1a1a;border-radius:2px;pointer-events:none}
 
 /* Footer bar */
 .augusta-footer{
@@ -841,7 +845,7 @@ input,select{font-family:inherit}
         </div>
       </div>
     </div>
-    <div class="augusta-legend">RED = Under Par &nbsp;|&nbsp; THRU = Holes Completed &nbsp;|&nbsp; Tap scores to see flip animation</div>
+    <div class="augusta-legend">🔴 Circle = Birdie &nbsp;|&nbsp; 🟡 Double Circle = Eagle &nbsp;|&nbsp; 🔵 Square = Bogey &nbsp;|&nbsp; ⬛ Square = Double+</div>
   </div>
 
   <!-- ENTER POOL TAB -->
