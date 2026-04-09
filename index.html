@@ -638,10 +638,22 @@ input,select{font-family:inherit}
 .btn-s:hover{background:var(--gp)}
 .btn-d{background:#fef2f2;color:var(--red);border:1px solid #fca5a5;padding:7px 12px;border-radius:6px;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
 .btn-d:hover{background:#fee2e2}
-.e-list{list-style:none;max-height:280px;overflow-y:auto}
-.e-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:7px;margin-bottom:6px;background:var(--cream);border:1px solid var(--gray-l)}
+.e-list{list-style:none;max-height:500px;overflow-y:auto}
+.e-item{border-radius:7px;margin-bottom:6px;background:var(--cream);border:1px solid var(--gray-l);overflow:hidden}
+.e-item-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px}
 .e-name{font-family:'EB Garamond',serif;font-size:15px;font-weight:600}
 .e-picks{font-size:11px;color:var(--gray);margin-top:1px}
+.e-actions{display:flex;gap:6px;flex-shrink:0}
+.btn-e{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:7px 12px;border-radius:6px;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.btn-e:hover{background:#dbeafe}
+.e-edit-panel{display:none;padding:12px;border-top:1px solid var(--gray-l);background:white}
+.e-edit-panel.open{display:block}
+.e-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.e-edit-grid .fg{display:flex;flex-direction:column;gap:3px}
+.e-edit-grid label{font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gm)}
+.e-edit-grid input,.e-edit-grid select{padding:7px 10px;border:1px solid var(--gray-l);border-radius:6px;font-family:'EB Garamond',serif;font-size:14px;background:var(--cream)}
+.e-edit-actions{display:flex;gap:8px;justify-content:flex-end}
+.e-edit-saving{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1px;color:var(--gray);display:none}
 .se-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:340px;overflow-y:auto}
 .se-row{display:flex;align-items:center;gap:7px;padding:8px 10px;background:var(--cream);border-radius:7px;border:1px solid var(--gray-l)}
 .se-name{flex:1;font-family:'EB Garamond',serif;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1153,6 +1165,7 @@ async function saveEntry(entry){
 async function updateEntry(entry){
   try{
     const {error} = await sb.from('entries').update({
+      name: entry.name,
       picks: entry.picks,
       tb_guess: entry.tbGuess,
       updated_at: new Date().toISOString()
@@ -1990,10 +2003,69 @@ function renderEntryList(){
   document.getElementById('entryCount').textContent='('+S.entries.length+')';
   const list=document.getElementById('entryList');
   if(!S.entries.length){list.innerHTML='<li style="color:var(--gray);font-size:14px;text-align:center;padding:20px">No entries yet.</li>';return;}
-  list.innerHTML=S.entries.map((e,i)=>`<li class="e-item">
-    <div><div class="e-name">${e.name}</div><div class="e-picks">${e.picks.filter(Boolean).join(', ')}</div></div>
-    <button class="btn-d" onclick="removeEntry(${i})">✕</button>
-  </li>`).join('');
+  const tierOpts=TKEYS.map((tk,ti)=>S.players[tk].map(p=>`<option value="${p}">${p}</option>`).join(''));
+  const wcOpts=WC_POOL.map(p=>`<option value="${p}">${p}</option>`).join('');
+  list.innerHTML=S.entries.map((e,i)=>{
+    const tierLabels=['🏆 Fav','⭐ Con','🎯 Slp','🎲 Lng','🃏 WC1','🃏 WC2'];
+    return`<li class="e-item">
+      <div class="e-item-row">
+        <div><div class="e-name">${e.name}</div><div class="e-picks">${e.picks.filter(Boolean).join(', ')}</div></div>
+        <div class="e-actions">
+          <button class="btn-e" onclick="toggleEditPanel(${i})">✏️ Edit</button>
+          <button class="btn-d" onclick="removeEntry(${i})">✕</button>
+        </div>
+      </div>
+      <div class="e-edit-panel" id="eep_${i}">
+        <div class="e-edit-grid">
+          <div class="fg"><label>Name</label><input id="ee_name_${i}" value="${e.name.replace(/"/g,'&quot;')}"></div>
+          <div class="fg"><label>Tiebreaker</label><input type="number" id="ee_tb_${i}" value="${e.tbGuess??''}" placeholder="e.g. -12"></div>
+          ${[0,1,2,3].map(ti=>`<div class="fg"><label>${tierLabels[ti]}</label><select id="ee_p${ti}_${i}"><option value="">—</option>${tierOpts[ti]}</select></div>`).join('')}
+          <div class="fg"><label>${tierLabels[4]}</label><select id="ee_p4_${i}"><option value="">—</option>${wcOpts}</select></div>
+          <div class="fg"><label>${tierLabels[5]}</label><select id="ee_p5_${i}"><option value="">—</option>${wcOpts}</select></div>
+        </div>
+        <div class="e-edit-actions">
+          <span class="e-edit-saving" id="ee_status_${i}">Saving…</span>
+          <button class="btn-s" onclick="toggleEditPanel(${i})">Cancel</button>
+          <button class="btn-p" onclick="saveEditEntry(${i})">💾 Save</button>
+        </div>
+      </div>
+    </li>`;
+  }).join('');
+  // Set current pick values on selects after render
+  S.entries.forEach((e,i)=>{
+    [0,1,2,3,4,5].forEach(ti=>{
+      const sel=document.getElementById(`ee_p${ti}_${i}`);
+      if(sel&&e.picks[ti])sel.value=e.picks[ti];
+    });
+  });
+}
+function toggleEditPanel(i){
+  const p=document.getElementById('eep_'+i);if(!p)return;
+  p.classList.toggle('open');
+}
+async function saveEditEntry(i){
+  const entry=S.entries[i];if(!entry)return;
+  const status=document.getElementById('ee_status_'+i);
+  const newName=document.getElementById('ee_name_'+i)?.value.trim();
+  const tbRaw=document.getElementById('ee_tb_'+i)?.value;
+  const tbGuess=tbRaw!==''&&tbRaw!==undefined?Number(tbRaw):null;
+  const picks=[0,1,2,3,4,5].map(ti=>document.getElementById(`ee_p${ti}_${i}`)?.value||'');
+  if(!newName){showAlert('addAlert','Name cannot be empty.','err');return;}
+  if(picks.some(p=>!p)){showAlert('addAlert','All 6 picks are required.','err');return;}
+  if(new Set(picks).size<6){showAlert('addAlert','All picks must be different players.','err');return;}
+  if(status)status.style.display='inline';
+  try{
+    const {error}=await sb.from('entries').update({name:newName,picks,tb_guess:tbGuess,updated_at:new Date().toISOString()}).eq('id',entry.id);
+    if(error)throw error;
+    entry.name=newName;entry.picks=picks;entry.tbGuess=tbGuess;
+    renderAll();renderAdmin();
+    showAlert('addAlert','Entry updated successfully.','ok');
+  }catch(e){
+    showAlert('addAlert','Error saving: '+(e?.message||e),'err');
+    console.error(e);
+  }finally{
+    if(status)status.style.display='none';
+  }
 }
 function renderFieldList(){
   document.getElementById('fieldList').innerHTML=TKEYS.map((tk,ti)=>{
