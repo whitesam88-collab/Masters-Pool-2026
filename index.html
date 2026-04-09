@@ -1834,7 +1834,17 @@ function copyShareLink(btn){
 }
 function handleUrlParams(){
   const params=new URLSearchParams(window.location.search);
-  if(params.get('join')==='1')setTimeout(()=>{const isMobile=window.innerWidth<=700;if(isMobile){showTab('enter',null);setMobileNav('enter');}else{showTab('enter',document.querySelectorAll('.desk-nav button')[2]);}},300);
+  const isMobile=window.innerWidth<=700;
+  // Restore tab from URL hash on refresh
+  const hash=window.location.hash.replace('#','');
+  const validTabs=['leaderboard','scores','enter','admin'];
+  if(hash&&validTabs.includes(hash)){
+    const tabIdx={leaderboard:0,scores:1,enter:2,admin:3}[hash];
+    if(isMobile){showTab(hash,null);setMobileNav(hash);}
+    else{showTab(hash,document.querySelectorAll('.desk-nav button')[tabIdx]);}
+    return; // Don't override with join param
+  }
+  if(params.get('join')==='1')setTimeout(()=>{if(isMobile){showTab('enter',null);setMobileNav('enter');}else{showTab('enter',document.querySelectorAll('.desk-nav button')[2]);}},300);
 }
 
 // ── LOCK ENTRIES ──
@@ -2177,9 +2187,11 @@ function showTab(id,btn){
   document.querySelectorAll('.desk-nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
-  if(id==='scores')renderScores();
+  if(id==='scores')loadAugustaScoreboard();
   if(id==='enter')renderEnter();
   if(id==='admin'&&document.getElementById('adminPanel').style.display==='block')renderAdmin();
+  // Persist tab in URL hash for refresh
+  if(history.replaceState)history.replaceState(null,null,'#'+id);
   window.scrollTo(0,0);
 }
 function setMobileNav(id){
