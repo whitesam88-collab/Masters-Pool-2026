@@ -1608,12 +1608,11 @@ async function loadAugustaScoreboard(){
   let data=null;
   for(const u of urls){try{const r=await fetch(u);if(r.ok){data=await r.json();break;}}catch(e){}}
 
-  if(!data||!data.events?.[0]?.competitions?.[0]?.competitors){
+  const comps=data?.events?.[0]?.competitions?.[0]?.competitors;
+  if(!comps||comps.length===0){
     renderAugustaDummy();
     return;
   }
-
-  const comps=data.events[0].competitions[0].competitors;
   const top15=comps.slice(0,15);
 
   // Fetch hole-by-hole for each player (all rounds)
