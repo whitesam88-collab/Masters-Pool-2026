@@ -1623,30 +1623,31 @@ async function loadAugustaScoreboard(){
   if(!tbody){augustaLoading=false;return;}
   tbody.innerHTML='<tr><td colspan="21" class="augusta-loading">Loading scoreboard...</td></tr>';
 
-  // Fetch from scoreboard header API (has live scores)
-  let headerData=null;
+  // Fetch from leaderboard API (returns ALL players, not just top few)
+  let lbData=null;
   try{
-    const hr=await fetch('https://site.web.api.espn.com/apis/v2/scoreboard/header?sport=golf&league=pga');
-    if(hr.ok)headerData=await hr.json();
+    const lr=await fetch('https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard');
+    if(lr.ok)lbData=await lr.json();
   }catch(e){}
 
-  const event=headerData?.sports?.[0]?.leagues?.[0]?.events?.[0];
-  const comps=event?.competitors;
-  if(!comps||comps.length===0){
+  const event=lbData?.events?.[0];
+  const competition=event?.competitions?.[0];
+  const comps=competition?.competitors||[];
+  if(!comps.length){
     renderAugustaDummy();
     augustaLoading=false;
     return;
   }
   const eventId=event.id||'401811941';
-  const top15=comps.slice(0,15);
 
-  // Fetch hole-by-hole for each player (all rounds)
+  // Fetch hole-by-hole for ALL players in parallel
   augustaPlayers=[];
-  for(const c of top15){
-    const id=c.id;
-    const name=c.displayName||c.name||'Unknown';
-    const totalScore=c.score||'E';
-    const thru=c.status?.thru||c.status?.hole||'F';
+  const fetchPromises=comps.map(async(c)=>{
+    const athlete=c.athlete||{};
+    const id=athlete.id||c.id;
+    const name=athlete.displayName||c.displayName||'Unknown';
+    const scoreVal=c.score?.displayValue||c.statistics?.find(s=>s.name==='scoreToPar')?.displayValue||'E';
+    const thru=c.status?.thru||c.status?.period||'F';
     let allRounds={1:Array(18).fill(''),2:Array(18).fill(''),3:Array(18).fill(''),4:Array(18).fill('')};
     let roundScores={1:null,2:null,3:null,4:null};
 
@@ -1669,8 +1670,9 @@ async function loadAugustaScoreboard(){
         }
       }catch(e){}
     }
-    augustaPlayers.push({name,totalScore,thru,allRounds,roundScores});
-  }
+    return{name,totalScore:scoreVal,thru,allRounds,roundScores};
+  });
+  augustaPlayers=await Promise.all(fetchPromises);
 
   // Sort by score (lowest first, E=0, negative numbers first)
   augustaPlayers.sort((a,b)=>{
