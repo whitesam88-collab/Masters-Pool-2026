@@ -1248,8 +1248,8 @@ function seed(){
 
 // ── SCORE HELPERS ──
 function gsc(n,r){const s=S.scores[n];if(!s)return null;if(s.cut&&r>=3)return 8;const v=s['r'+r];return(v===''||v===null||v===undefined)?null:Number(v);}
-function entRnd(e,r){const v=e.picks.map(p=>p?gsc(p,r):null).filter(x=>x!==null);if(v.length<6)return v.reduce((a,b)=>a+b,0);return[...v].sort((a,b)=>a-b).slice(0,4).reduce((a,b)=>a+b,0);}
-function entTot(e){let t=0;for(let r=1;r<=S.settings.activeRound;r++)t+=entRnd(e,r);return t;}
+function entRnd(e,r){const v=e.picks.map(p=>p?gsc(p,r):null).filter(x=>x!==null);if(!v.length)return null;if(v.length<6)return v.reduce((a,b)=>a+b,0);return[...v].sort((a,b)=>a-b).slice(0,4).reduce((a,b)=>a+b,0);}
+function entTot(e){let t=0;for(let r=1;r<=S.settings.activeRound;r++){const v=entRnd(e,r);if(v!==null)t+=v;}return t;}
 function fmt(n){if(n===null||n===undefined||isNaN(n))return'—';if(n===0)return'E';return n>0?'+'+n:String(n);}
 function uc(n){return(n!==null&&n<0)?'u':'';}
 
@@ -1268,7 +1268,7 @@ function tiebreakSort(a,b){
       if(ag!==bg)return ag-bg;
     }
   }else if(mode==='best_round'){
-    for(let r=4;r>=1;r--){const ar=entRnd(a.e,r),br=entRnd(b.e,r);if(ar!==br)return ar-br;}
+    for(let r=4;r>=1;r--){const ar=entRnd(a.e,r)??999,br=entRnd(b.e,r)??999;if(ar!==br)return ar-br;}
   }
   return a.e.name.localeCompare(b.e.name);
 }
@@ -1336,7 +1336,7 @@ function renderLB(){
   }
   const ranked=S.entries.map(e=>{
     const rs=[1,2,3,4].map(r=>entRnd(e,r));
-    const tot=rs.reduce((a,b)=>a+b,0);
+    const tot=rs.filter(v=>v!==null).reduce((a,b)=>a+b,0);
     const ds=lbR===0?tot:entRnd(e,lbR);
     return{e,rs,tot,ds};
   }).sort(tiebreakSort);
@@ -1383,7 +1383,7 @@ function renderLB(){
       <div class="lb-sc ${uc(rs[2])}">${fmt(rs[2])}</div>
       <div class="lb-sc ${uc(rs[3])}">${fmt(rs[3])}</div>
       <div class="lb-sc tot">${fmt(tot)}</div>
-      <div class="lb-exp" id="exp${idx}">${buildPicks(e)}</div>
+      <div class="lb-exp" id="exp${idx}">${buildPicks(e,lbR)}</div>
     </div>`;
   }).join('');
 
@@ -1405,7 +1405,7 @@ function renderLB(){
         </div>
         <div class="lb-m-tot">${fmt(tot)}</div>
       </div>
-      <div class="lb-m-exp" id="mexp${idx}">${buildPicks(e)}</div>
+      <div class="lb-m-exp" id="mexp${idx}">${buildPicks(e,lbR)}</div>
     </div>`;
   }).join('');
 
@@ -1415,15 +1415,17 @@ function renderLB(){
   if(myInput&&myInput.value.trim())lookupMyEntry(myInput.value);
 }
 
-function buildPicks(entry){
-  const ar=S.settings.activeRound;
+function buildPicks(entry,round){
+  const ar=round||S.settings.activeRound;
   const scored=entry.picks.map((p,i)=>({i,v:p?gsc(p,ar):null})).filter(x=>x.v!==null);
   scored.sort((a,b)=>a.v-b.v);
   const cts=new Set(scored.slice(0,4).map(x=>x.i));
-  return`<div style="font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gm);margin-bottom:8px">R${ar} Picks</div>
+  const label=round===0||!round?'Overall':'R'+ar;
+  return`<div style="font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gm);margin-bottom:8px">${label} Picks</div>
     <div class="picks-grid">${entry.picks.map((p,i)=>{
       const s=p?S.scores[p]:null;const isCut=s&&s.cut;
-      const cur=p?gsc(p,ar):null;const counts=cts.has(i)&&!isCut;
+      const cur=round===0||!round?[1,2,3,4].map(r=>gsc(p,r)).filter(x=>x!==null).reduce((a,b)=>a+b,0)||null:gsc(p,ar);
+      const counts=cts.has(i)&&!isCut;
       return`<div class="pick-card ${isCut?'cut':''}">
         <div class="ptier">${EMO[i]} ${TIERS[i]}</div>
         <div class="pname">${p||'—'}</div>
@@ -1489,7 +1491,7 @@ function lookupMyEntry(val){
     res.innerHTML=`<div style="padding:14px;font-family:'EB Garamond',serif;font-size:15px;color:var(--gray);text-align:center">No entry found for "<strong>${val.trim()}</strong>"</div>`;
     return;
   }
-  const allRanked=S.entries.map(e=>{const rs=[1,2,3,4].map(r=>entRnd(e,r));const tot=rs.reduce((a,b)=>a+b,0);return{e,rs,tot,ds:tot};}).sort(tiebreakSort);
+  const allRanked=S.entries.map(e=>{const rs=[1,2,3,4].map(r=>entRnd(e,r));const tot=rs.filter(v=>v!==null).reduce((a,b)=>a+b,0);return{e,rs,tot,ds:tot};}).sort(tiebreakSort);
   const rankIdx=allRanked.findIndex(r=>r.e.name===entry.name);
   const rank=rankIdx+1;
   const item=allRanked[rankIdx];
@@ -1617,70 +1619,93 @@ function setAugustaRound(round,btn){
 
 let augustaLoading=false;
 async function loadAugustaScoreboard(){
-  if(augustaLoading)return; // Prevent concurrent calls
+  if(augustaLoading)return;
   augustaLoading=true;
   const tbody=document.getElementById('augustaScoreboard');
   if(!tbody){augustaLoading=false;return;}
-  tbody.innerHTML='<tr><td colspan="21" class="augusta-loading">Loading scoreboard...</td></tr>';
+  tbody.textContent='';
+  const loadingRow=document.createElement('tr');
+  const loadingTd=document.createElement('td');
+  loadingTd.setAttribute('colspan','21');
+  loadingTd.className='augusta-loading';
+  loadingTd.textContent='Loading scoreboard...';
+  loadingRow.appendChild(loadingTd);
+  tbody.appendChild(loadingRow);
 
-  // Fetch from leaderboard API (returns ALL players, not just top few)
-  let lbData=null;
+  const EVENT='401811941';
+  const CORE='https://sports.core.api.espn.com/v2/sports/golf/leagues/pga';
+  const COMP=`${CORE}/events/${EVENT}/competitions/${EVENT}/competitors`;
+
   try{
-    const lr=await fetch('https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard');
-    if(lr.ok)lbData=await lr.json();
-  }catch(e){}
+    const listR=await fetch(`${COMP}?limit=200`);
+    if(!listR.ok)throw new Error('Failed to fetch competitors');
+    const{items=[]}=await listR.json();
+    if(!items.length){renderAugustaDummy();augustaLoading=false;return;}
 
-  const event=lbData?.events?.[0];
-  const competition=event?.competitions?.[0];
-  const comps=competition?.competitors||[];
-  if(!comps.length){
-    renderAugustaDummy();
-    augustaLoading=false;
-    return;
-  }
-  const eventId=event.id||'401811941';
+    const CACHE_KEY='espn_names_'+EVENT;
+    let nameCache={};
+    try{
+      const raw=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');
+      if(Object.keys(raw.names||{}).length>80&&Date.now()-(raw.ts||0)<43200000)nameCache=raw.names;
+    }catch(e){}
 
-  // Fetch hole-by-hole for ALL players in parallel
-  augustaPlayers=[];
-  const fetchPromises=comps.map(async(c)=>{
-    const athlete=c.athlete||{};
-    const id=athlete.id||c.id;
-    const name=athlete.displayName||c.displayName||'Unknown';
-    const scoreVal=c.score?.displayValue||c.statistics?.find(s=>s.name==='scoreToPar')?.displayValue||'E';
-    const thru=c.status?.thru||c.status?.period||'F';
-    let allRounds={1:Array(18).fill(''),2:Array(18).fill(''),3:Array(18).fill(''),4:Array(18).fill('')};
-    let roundScores={1:null,2:null,3:null,4:null};
+    const needNames=items.filter(item=>!nameCache[item.id]);
+    if(needNames.length>0){
+      await Promise.all(needNames.map(async({id})=>{
+        try{
+          const r=await fetch(`${CORE}/seasons/2026/athletes/${id}`);
+          if(r.ok){const d=await r.json();nameCache[id]=d.displayName||d.fullName||null;}
+        }catch(e){}
+      }));
+      try{localStorage.setItem(CACHE_KEY,JSON.stringify({names:nameCache,ts:Date.now()}));}catch(e){}
+    }
 
-    if(id){
+    augustaPlayers=await Promise.all(items.map(async({id})=>{
+      const name=nameCache[id]||'Unknown';
+      let allRounds={1:Array(18).fill(''),2:Array(18).fill(''),3:Array(18).fill(''),4:Array(18).fill('')};
+      let roundScores={1:null,2:null,3:null,4:null};
+      let totalScore='E',thru='—';
+
       try{
-        const detailUrl=`https://sports.core.api.espn.com/v2/sports/golf/leagues/pga/events/${eventId}/competitions/${eventId}/competitors/${id}/linescores`;
-        const dr=await fetch(detailUrl);
-        if(dr.ok){
-          const dd=await dr.json();
-          const rounds=dd.items||[];
-          rounds.forEach((rd,idx)=>{
+        const[lsR,scR,stR]=await Promise.all([
+          fetch(`${COMP}/${id}/linescores`),
+          fetch(`${COMP}/${id}/score`),
+          fetch(`${COMP}/${id}/status`)
+        ]);
+        if(lsR.ok){
+          const dd=await lsR.json();
+          (dd.items||[]).forEach((rd,idx)=>{
             const rNum=idx+1;
             if(rd.linescores){
               rd.linescores.forEach((ls,i)=>{
                 if(i<18&&ls.value!==undefined)allRounds[rNum][i]=ls.value;
               });
             }
-            if(rd.displayValue)roundScores[rNum]=rd.displayValue;
+            if(rd.displayValue&&rd.displayValue!=='-')roundScores[rNum]=rd.displayValue;
           });
         }
+        if(scR.ok){
+          const sc=await scR.json();
+          totalScore=sc.displayValue||'E';
+        }
+        if(stR.ok){
+          const st=await stR.json();
+          thru=st.thru||st.period||'F';
+        }
       }catch(e){}
-    }
-    return{name,totalScore:scoreVal,thru,allRounds,roundScores};
-  });
-  augustaPlayers=await Promise.all(fetchPromises);
+      return{name,totalScore,thru,allRounds,roundScores};
+    }));
 
-  // Sort by score (lowest first, E=0, negative numbers first)
-  augustaPlayers.sort((a,b)=>{
-    const parseScore=(s)=>s==='E'?0:(s==='-'||s==='--'?999:parseInt(s)||999);
-    return parseScore(a.totalScore)-parseScore(b.totalScore);
-  });
+    augustaPlayers.sort((a,b)=>{
+      const parseScore=(s)=>s==='E'?0:(s==='-'||s==='--'?999:parseInt(s)||999);
+      return parseScore(a.totalScore)-parseScore(b.totalScore);
+    });
 
-  renderAugustaBoard();
+    renderAugustaBoard();
+  }catch(e){
+    console.error('loadAugustaScoreboard error:',e);
+    renderAugustaDummy();
+  }
   augustaLoading=false;
 }
 
@@ -2009,7 +2034,7 @@ function updatePrizePool(){
 function exportCSV(){
   const fee=S.settings.entryFee||0;const splits=S.settings.splits||{s1:60,s2:25,s3:15};
   const headers=['Rank','Entry','Tiebreaker Guess','Favorites','Contenders','Sleepers','Longshots','Wild Card 1','Wild Card 2','R1','R2','R3','R4','Total','Payout'];
-  const ranked=S.entries.map(e=>{const rs=[1,2,3,4].map(r=>entRnd(e,r));const tot=rs.reduce((a,b)=>a+b,0);return{e,rs,tot,ds:tot};}).sort(tiebreakSort);
+  const ranked=S.entries.map(e=>{const rs=[1,2,3,4].map(r=>entRnd(e,r));const tot=rs.filter(v=>v!==null).reduce((a,b)=>a+b,0);return{e,rs,tot,ds:tot};}).sort(tiebreakSort);
   const total=fee*ranked.length;
   const payouts={1:Math.round(total*splits.s1/100),2:Math.round(total*splits.s2/100),3:total-Math.round(total*splits.s1/100)-Math.round(total*splits.s2/100)};
   const fmtSc=n=>n===0?'E':n>0?'+'+n:String(n);
