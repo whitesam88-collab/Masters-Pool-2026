@@ -1337,7 +1337,7 @@ function renderLB(){
   const ranked=S.entries.map(e=>{
     const rs=[1,2,3,4].map(r=>entRnd(e,r));
     const tot=rs.filter(v=>v!==null).reduce((a,b)=>a+b,0);
-    const ds=lbR===0?tot:entRnd(e,lbR);
+    const ds=tot;
     return{e,rs,tot,ds};
   }).sort(tiebreakSort);
   updateMovement(ranked);
