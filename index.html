@@ -334,6 +334,22 @@ input,select{font-family:inherit}
   box-shadow:0 1px 0 rgba(255,255,255,0.5);
 }
 
+/* POS column */
+.augusta-table .col-pos{
+  width:36px;
+  font-size:12px;
+  font-weight:700;
+  text-align:center;
+  background:linear-gradient(180deg,
+    #f8f5ed 0%,
+    #f2efe6 15%,
+    #ebe8df 50%,
+    #e3e0d6 85%,
+    #dbd8ce 100%
+  );
+}
+.augusta-table th.col-pos{font-size:10px;font-weight:700}
+
 /* SCORE column - left side, larger */
 .augusta-table .col-score{
   width:54px;
@@ -548,6 +564,7 @@ input,select{font-family:inherit}
   .augusta-table{border-spacing:1px}
   .augusta-table th{height:22px;font-size:8px}
   .augusta-table td{height:30px;font-size:12px}
+  .augusta-table .col-pos{width:28px;font-size:10px}
   .augusta-table .col-score{width:40px;font-size:14px}
   .augusta-table .col-name{width:90px;font-size:10px;padding-left:6px}
   .augusta-table .col-hole{width:26px}
@@ -820,6 +837,7 @@ input,select{font-family:inherit}
             <table class="augusta-table">
               <thead>
                 <tr>
+                  <th class="col-pos">POS</th>
                   <th class="col-score">SCORE</th>
                   <th class="col-name">PLAYER</th>
                   <th class="col-hole">1</th>
@@ -1626,7 +1644,7 @@ async function loadAugustaScoreboard(){
   tbody.textContent='';
   const loadingRow=document.createElement('tr');
   const loadingTd=document.createElement('td');
-  loadingTd.setAttribute('colspan','21');
+  loadingTd.setAttribute('colspan','22');
   loadingTd.className='augusta-loading';
   loadingTd.textContent='Loading scoreboard...';
   loadingRow.appendChild(loadingTd);
@@ -1664,6 +1682,7 @@ async function loadAugustaScoreboard(){
       const name=nameCache[id]||'Unknown';
       let allRounds={1:Array(18).fill(''),2:Array(18).fill(''),3:Array(18).fill(''),4:Array(18).fill('')};
       let roundScores={1:null,2:null,3:null,4:null};
+      let teeTimes={1:null,2:null,3:null,4:null};
       let totalScore='E',thru='—';
 
       try{
@@ -1682,6 +1701,10 @@ async function loadAugustaScoreboard(){
               });
             }
             if(rd.displayValue&&rd.displayValue!=='-')roundScores[rNum]=rd.displayValue;
+            if(rd.teeTime){
+              const d=new Date(rd.teeTime);
+              teeTimes[rNum]=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+            }
           });
         }
         if(scR.ok){
@@ -1693,7 +1716,7 @@ async function loadAugustaScoreboard(){
           thru=st.thru||st.period||'F';
         }
       }catch(e){}
-      return{name,totalScore,thru,allRounds,roundScores};
+      return{name,totalScore,thru,allRounds,roundScores,teeTimes};
     }));
 
     augustaPlayers.sort((a,b)=>{
@@ -1713,7 +1736,7 @@ function renderAugustaDummy(){
   augustaPlayers=[];
   const tbody=document.getElementById('augustaScoreboard');
   if(tbody){
-    tbody.innerHTML='<tr><td colspan="21" style="text-align:center;padding:40px;color:#6b7280;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;">Live scores will appear when the tournament begins.<br>Round 1 starts Thursday, April 10.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="22" style="text-align:center;padding:40px;color:#6b7280;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;">Live scores will appear when the tournament begins.<br>Round 1 starts Thursday, April 10.</td></tr>';
   }
   const st=document.getElementById('augustaSyncTime');
   if(st)st.textContent='Waiting for tournament to begin';
@@ -1724,33 +1747,55 @@ function renderAugustaBoard(){
   if(!tbody)return;
 
   let html='';
-  augustaPlayers.forEach(p=>{
+  let pos=0,lastScore=null,lastPos=0;
+  augustaPlayers.forEach((p,idx)=>{
+    // Calculate position (handle ties)
+    pos=idx+1;
+    const scoreKey=p.totalScore;
+    if(scoreKey===lastScore){pos=lastPos;}
+    else{lastScore=scoreKey;lastPos=pos;}
     // Get score and holes based on selected round
     let displayScore, displayHoles, displayThru;
 
+    let teeTime=null;
     if(augustaRound===0){
       // Total view - show total score and current round holes
       displayScore=p.totalScore;
       displayThru=p.thru;
       // Find the current round (last one with data)
+      let currentRound=1;
       for(let r=4;r>=1;r--){
         if(p.allRounds[r].some(h=>h!=='')){
           displayHoles=p.allRounds[r];
+          currentRound=r;
           break;
         }
       }
-      if(!displayHoles)displayHoles=p.allRounds[1];
+      if(!displayHoles){
+        displayHoles=p.allRounds[1];
+        // No holes played yet - show next tee time
+        for(let r=1;r<=4;r++){
+          if(p.teeTimes[r]){teeTime=p.teeTimes[r];break;}
+        }
+      }
     }else{
       // Specific round view
       displayScore=p.roundScores[augustaRound]||'-';
       displayHoles=p.allRounds[augustaRound];
-      displayThru=displayHoles.filter(h=>h!=='').length===18?'F':displayHoles.filter(h=>h!=='').length||'-';
+      const holesPlayed=displayHoles.filter(h=>h!=='').length;
+      displayThru=holesPlayed===18?'F':holesPlayed||'-';
+      // Show tee time if no holes played this round
+      if(holesPlayed===0&&p.teeTimes[augustaRound]){
+        teeTime=p.teeTimes[augustaRound];
+      }
     }
 
     const scoreNum=displayScore==='E'?0:(displayScore==='-'?999:parseInt(displayScore));
     const scoreCls=scoreNum<0?'score-under':scoreNum===0?'score-even':'score-over';
 
+    const posDisplay=pos===lastPos&&idx>0&&augustaPlayers[idx-1].totalScore===scoreKey?'T'+pos:pos;
     html+=`<tr>
+      <td class="col-pos">${posDisplay}</td>
       <td class="col-score ${scoreCls}">${displayScore}</td>
       <td class="col-name player-name">${p.name.toUpperCase()}</td>`;
 
@@ -1769,7 +1814,7 @@ function renderAugustaBoard(){
       }
     }
 
-    html+=`<td class="col-thru">${displayThru}</td></tr>`;
+    html+=`<td class="col-thru">${teeTime||displayThru}</td></tr>`;
   });
 
   tbody.innerHTML=html;
